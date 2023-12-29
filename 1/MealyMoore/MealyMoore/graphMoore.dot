@@ -1,0 +1,2 @@
+digraph G {
+    s3 -> s0 [label="x1"];    s2y1 -> s1y3 [label="x2"];    s3 -> s2y1 [label="x2"];}
