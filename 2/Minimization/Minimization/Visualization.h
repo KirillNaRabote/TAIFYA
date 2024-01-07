@@ -88,12 +88,12 @@ void VisualizeMooreGraph(std::ofstream& output, const TransitionTable& table)
     }
 }
 
-void VisualizeGraph(const TransitionTable& table, unsigned type)
+void VisualizeGraph(const TransitionTable& table, unsigned type, const std::string& suffix)
 {
     std::string graphName = "graph";
     std::string typeStr = (type == MEALY_TYPE) ? "Mealy" : "Moore";
-    std::string dotFileName = graphName + typeStr + ".dot";
-    std::string imageFileName = "graph" + typeStr + ".png";
+    std::string dotFileName = graphName + typeStr + suffix + ".dot";
+    std::string imageFileName = graphName + typeStr + suffix + ".png";
 
     std::ofstream outputDotFile(dotFileName);
 

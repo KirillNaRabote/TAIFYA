@@ -6,19 +6,30 @@
 
 #include "types.h"
 
-void AddReachableVert(std::set<unsigned>& reachableVertices)
+void AddReachableVert(const TransitionTable& table, std::set<unsigned>& reachableVertices, int vert, unsigned type)
 {
+	reachableVertices.insert(vert);
+	size_t row;
+	(type == MEALY_TYPE) ? row = 0 : row = 1;
 
+	for (row; row < table.size(); row++)
+	{
+		int newVert = table[row][vert].state;
+		if (newVert != NUMBER_SYMBOLIZING_ABSENCE
+			&& reachableVertices.find(newVert) == reachableVertices.end())
+		{
+			AddReachableVert(table, reachableVertices, newVert, type);
+		}
+	}
 }
 
 TransitionTable RemoveUnreachableVertices(const TransitionTable& table, unsigned type)
 {
 	std::set<unsigned> reachableVertices;
-	reachableVertices.insert(0);
+	int initialVert = 0;
+	AddReachableVert(table, reachableVertices, initialVert, type);
 
-
-
-	/*size_t row;
+	size_t row;
 	(type == MEALY_TYPE) ? row = 0 : row = 1;
 
 	std::set<int> allVertices;
@@ -27,28 +38,14 @@ TransitionTable RemoveUnreachableVertices(const TransitionTable& table, unsigned
 		allVertices.insert(i);
 	}
 
-	std::set<int> reachableVertices;
-	reachableVertices.insert(0);
-
 	std::set<int> unreachableVertices;
-
-	for (row; row < table.size(); row++)
-	{
-		for (size_t column = 0; column < table[0].size(); column++)
-		{
-			if (table[row][column].state != NUMBER_SYMBOLIZING_ABSENCE)
-			{
-				reachableVertices.insert(table[row][column].state);
-			}
-		}
-	}
 	
 	TransitionTable tableWithoutUnreachableVertices(table.size(), std::vector<Transition>(reachableVertices.size()));
 	std::set_difference(allVertices.begin(), allVertices.end(), reachableVertices.begin(), reachableVertices.end(),
 		std::inserter(unreachableVertices, unreachableVertices.begin()));
 
 	size_t col = 0;
-	for (std::set<int>::iterator itReachable = reachableVertices.begin(); itReachable != reachableVertices.end(); itReachable++, col++)
+	for (std::set<unsigned>::iterator itReachable = reachableVertices.begin(); itReachable != reachableVertices.end(); itReachable++, col++)
 	{
 		for (row = 0; row < tableWithoutUnreachableVertices.size(); row++)
 		{
@@ -67,7 +64,7 @@ TransitionTable RemoveUnreachableVertices(const TransitionTable& table, unsigned
 		}
 	}
 
-	return tableWithoutUnreachableVertices;*/
+	return tableWithoutUnreachableVertices;
 }
 
 //добавляет вершину в структуру следующего типа
@@ -199,6 +196,8 @@ int FindIntermediateVertInPairs(const std::vector<std::pair<std::set<unsigned>, 
 			return pairIndex;
 		}
 	}
+
+	return NUMBER_SYMBOLIZING_ABSENCE;
 }
 
 TransitionTable CreateIntermediateTable(
@@ -305,6 +304,21 @@ TransitionTable MinimizeTable(const TransitionTable& table, unsigned type)
 	std::vector<std::pair<std::set<unsigned>, std::vector<int>>> oldPairsVertecsOutputSymbols;
 	std::vector<std::pair<std::set<unsigned>, std::vector<int>>> newPairsVertecsOutputSymbols = SplitVerticesIntoIntermediateSets(minimizedTable, type);
 
+	/*for (auto p : newPairsVertecsOutputSymbols)
+	{
+		std::cout << "[";
+		for (auto vert : p.first)
+		{
+			std::cout << vert << ", ";
+		}
+		std::cout << "] : {";
+		for (auto outp : p.second)
+		{
+			std::cout << outp << ", ";
+		}
+		std::cout << "}" << std::endl;
+	}*/
+
 	TransitionTable intermediateTable = CreateIntermediateTable(minimizedTable, newPairsVertecsOutputSymbols, type);
 
 	/*for (size_t row = 0; row < intermediateTable.size(); row++)
@@ -364,6 +378,21 @@ TransitionTable MinimizeTable(const TransitionTable& table, unsigned type)
 		std::cout << std::endl;
 	}
 	std::cout << std::endl;*/
+
+	/*for (size_t pairIndex = 0; pairIndex < newPairsVertecsOutputSymbols.size(); pairIndex++)
+	{
+		std::cout << "A" << pairIndex << " = {";
+		for (auto vert : newPairsVertecsOutputSymbols[pairIndex].first)
+		{
+			std::cout << vert << "; ";
+		}
+		std::cout << "} : [";
+		for (auto outputSymbol : newPairsVertecsOutputSymbols[pairIndex].second)
+		{
+			std::cout << outputSymbol << "; ";
+		}
+		std::cout << "]" << std::endl;
+	}*/
 
 	/*for (size_t row = 0; row < minimizedTable.size(); row++)
 	{

@@ -1,0 +1,4 @@
+digraph G {
+    s0 -> s1 [label="x1_"];
+    s0 -> s1 [label="x2_"];
+}

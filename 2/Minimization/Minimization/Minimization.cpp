@@ -34,8 +34,8 @@ int main(int argc, char* argv[])
 
         PrintTransitionTableToFile(outputFile, newTable, type);
 
-        /*VisualizeGraph(tTable, type);
-        VisualizeGraph(newTable, type);*/
+        VisualizeGraph(tTable, type, "Before");
+        VisualizeGraph(newTable, type, "After");
     }
     catch (const exception& ex)
     {
