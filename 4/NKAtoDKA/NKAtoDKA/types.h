@@ -1,6 +1,11 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <iostream>
+
+const char DELIMETER_CSV = ';';
+const char FINISH_STATE = 'F';
+const std::string EMPTY_SYMBOL = "e";
 
 struct Vertex
 {
@@ -8,4 +13,5 @@ struct Vertex
 	bool isFinish = false;
 };
 
-using Table = std::vector<std::vector<std::vector<Vertex>>>; // ¬нутренний вектор нужен, так как в €чейке таблицы может быть несколько вершин
+using Table = std::vector<std::vector<std::vector<Vertex>>>;
+using Transitions = std::vector<std::pair<Vertex, std::vector<Vertex>>>;

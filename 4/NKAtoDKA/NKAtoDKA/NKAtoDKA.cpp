@@ -1,21 +1,13 @@
 ﻿#include <iostream>
 #include <fstream>
 
+
 #include "types.h"
 #include "InputOutputHandler.h"
-#include "FileHandler.h"
+#include "CFileHandler.h"
+#include "CNKAtoDKA.h"
 
 using namespace std;
-
-template <typename T>
-void PrintVector(vector<T> vec)
-{
-    for (const auto& el : vec)
-    {
-        cout << el << " ";
-    }
-    cout << endl;
-}
 
 int main(int argc, char* argv[])
 {
@@ -32,7 +24,14 @@ int main(int argc, char* argv[])
         CheckFile(inputFile, inputFileName);
         CheckFile(outputFile, outputFileName);
 
-        Table tableNKA = ReadTable(inputFile);
+        Table tableNKA = CFileHandler::ReadTable(inputFile);
+
+        Table tableDKA = CNKAtoDKA::ConvertNKAtoDKA(tableNKA);
+
+        CFileHandler::PrintTable(outputFile, tableDKA);
+
+        inputFile.close();
+        outputFile.close();
     }
     catch(const exception& e)
     {

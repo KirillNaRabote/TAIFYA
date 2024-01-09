@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{51f26e3d-7b89-46aa-a1f2-9d77dd991f3e}</ProjectGuid>
-    <RootNamespace>NKAtoDKA</RootNamespace>
+    <ProjectGuid>{d4e983cb-5e84-469d-a4d1-a74eb5c4b2e3}</ProjectGuid>
+    <RootNamespace>Lexer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,15 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CFileHandler.cpp" />
-    <ClCompile Include="CNKAtoDKA.cpp" />
-    <ClCompile Include="NKAtoDKA.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="CFileHandler.h" />
-    <ClInclude Include="CNKAtoDKA.h" />
-    <ClInclude Include="InputOutputHandler.h" />
-    <ClInclude Include="types.h" />
+    <ClCompile Include="Lexer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
