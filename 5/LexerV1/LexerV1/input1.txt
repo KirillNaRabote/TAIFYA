@@ -1,0 +1,17 @@
+string
+bebra
+{
+int main
+{
+    "stroka
+     v vde stroki"
+    //ya krutoi
+    /*int a = a + b;
+    int 2ba = 05642.065165
+    string str = 'bebra';*/
+    /*int a = a + b;
+    int 2ba = 
+    //comment 05642.065165
+    string str = 'bebra';*/
+    int kirill;
+}

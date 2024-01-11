@@ -22,9 +22,7 @@ int main(int argc, char* argv[])
         CheckFile(outputFile, outputFileName);
 
         unsigned type;
-
         TransitionTable tTable;
-
         ReadFuncReturnableValue returnableValue = ReadTransitionTableFromFile(inputFile);
 
         tTable = returnableValue.table;

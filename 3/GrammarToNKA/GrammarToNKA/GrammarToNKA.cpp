@@ -7,30 +7,6 @@
 
 using namespace std;
 
-//void PrintGrammar(const Grammar& grammar)
-//{
-//	for (const auto& rule : grammar)
-//	{
-//		cout << rule.first << "=";
-//
-//		for (const auto& signalAndState : rule.second)
-//		{
-//			cout << signalAndState.first << "-" << signalAndState.second << "|";
-//		}
-//		cout << endl;
-//	}
-//}
-//
-//template<typename T>
-//void PrintVector(const vector<T>& vec)
-//{
-//	for (const auto& element : vec)
-//	{
-//		cout << element << " ";
-//	}
-//	cout << endl;
-//}
-
 int main(int argc, char* argv[])
 {
 	try

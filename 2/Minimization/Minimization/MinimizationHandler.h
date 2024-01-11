@@ -67,12 +67,6 @@ TransitionTable RemoveUnreachableVertices(const TransitionTable& table, unsigned
 	return tableWithoutUnreachableVertices;
 }
 
-//добавляет вершину в структуру следующего типа
-//A0 = {0; 1; 4; 5; } : [1; 1; ]
-//A0 - название
-//{} - вершины с одинаковыми выходными сигналами
-//[] - выходные сигналы / ?переходы?
-
 std::vector<std::pair<std::set<unsigned>, std::vector<int>>> SplitVerticesIntoIntermediateSets(const TransitionTable& table, unsigned type)
 {
 	std::vector<std::pair<std::set<unsigned>, std::vector<int>>> pairsVertecsOutputSymbols;
@@ -291,118 +285,20 @@ TransitionTable MinimizeTable(const TransitionTable& table, unsigned type)
 {
 	TransitionTable minimizedTable = RemoveUnreachableVertices(table, type);
 
-	/*for (size_t row = 0; row < minimizedTable.size(); row++)
-	{
-		for (size_t col = 0; col < minimizedTable[0].size(); col++)
-		{
-			std::cout << minimizedTable[row][col].state << " " << minimizedTable[row][col].outputSymbol << ";";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;*/
-
 	std::vector<std::pair<std::set<unsigned>, std::vector<int>>> oldPairsVertecsOutputSymbols;
 	std::vector<std::pair<std::set<unsigned>, std::vector<int>>> newPairsVertecsOutputSymbols = SplitVerticesIntoIntermediateSets(minimizedTable, type);
 
-	/*for (auto p : newPairsVertecsOutputSymbols)
-	{
-		std::cout << "[";
-		for (auto vert : p.first)
-		{
-			std::cout << vert << ", ";
-		}
-		std::cout << "] : {";
-		for (auto outp : p.second)
-		{
-			std::cout << outp << ", ";
-		}
-		std::cout << "}" << std::endl;
-	}*/
-
 	TransitionTable intermediateTable = CreateIntermediateTable(minimizedTable, newPairsVertecsOutputSymbols, type);
-
-	/*for (size_t row = 0; row < intermediateTable.size(); row++)
-	{
-		for (size_t col = 0; col < intermediateTable[0].size(); col++)
-		{
-			std::cout << intermediateTable[row][col].state << " " << intermediateTable[row][col].outputSymbol << ";";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;*/
-
-	/*for (size_t pairIndex = 0; pairIndex < newPairsVertecsOutputSymbols.size(); pairIndex++)
-	{
-		std::cout << "A" << pairIndex << " = {";
-		for (auto vert : newPairsVertecsOutputSymbols[pairIndex].first)
-		{
-			std::cout << vert << "; ";
-		}
-		std::cout << "} : [";
-		for (auto outputSymbol : newPairsVertecsOutputSymbols[pairIndex].second)
-		{
-			std::cout << outputSymbol << "; ";
-		}
-		std::cout << "]" << std::endl;
-	}*/
 
 	while (!AreEqualPairs(oldPairsVertecsOutputSymbols, newPairsVertecsOutputSymbols))
 	{
 		oldPairsVertecsOutputSymbols = newPairsVertecsOutputSymbols;
 		newPairsVertecsOutputSymbols = SplitIntermediateVerticesIntoIntermediateSets(intermediateTable, oldPairsVertecsOutputSymbols);
-		/*for (size_t pairIndex = 0; pairIndex < newPairsVertecsOutputSymbols.size(); pairIndex++)
-		{
-			std::cout << "A" << pairIndex << " = {";
-			for (auto vert : newPairsVertecsOutputSymbols[pairIndex].first)
-			{
-				std::cout << vert << "; ";
-			}
-			std::cout << "} : [";
-			for (auto outputSymbol : newPairsVertecsOutputSymbols[pairIndex].second)
-			{
-				std::cout << outputSymbol << "; ";
-			}
-			std::cout << "]" << std::endl;
-		}*/
+		
 		intermediateTable = CreateIntermediateTable(minimizedTable, newPairsVertecsOutputSymbols, type);
 	}
 
 	minimizedTable = CreateFinalTableFromIntermediate(minimizedTable, intermediateTable, newPairsVertecsOutputSymbols, type);
-
-	/*for (size_t row = 0; row < intermediateTable.size(); row++)
-	{
-		for (size_t col = 0; col < intermediateTable[0].size(); col++)
-		{
-			std::cout << intermediateTable[row][col].state << " " << intermediateTable[row][col].outputSymbol << ";";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;*/
-
-	/*for (size_t pairIndex = 0; pairIndex < newPairsVertecsOutputSymbols.size(); pairIndex++)
-	{
-		std::cout << "A" << pairIndex << " = {";
-		for (auto vert : newPairsVertecsOutputSymbols[pairIndex].first)
-		{
-			std::cout << vert << "; ";
-		}
-		std::cout << "} : [";
-		for (auto outputSymbol : newPairsVertecsOutputSymbols[pairIndex].second)
-		{
-			std::cout << outputSymbol << "; ";
-		}
-		std::cout << "]" << std::endl;
-	}*/
-
-	/*for (size_t row = 0; row < minimizedTable.size(); row++)
-	{
-		for (size_t col = 0; col < minimizedTable[0].size(); col++)
-		{
-			std::cout << minimizedTable[row][col].state << " " << minimizedTable[row][col].outputSymbol << ";";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;*/
 
 	return minimizedTable;
 }

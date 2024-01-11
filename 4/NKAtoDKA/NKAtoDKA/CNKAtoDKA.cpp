@@ -121,11 +121,11 @@ Transitions CNKAtoDKA::CreateTransitionsByEmptySymbols(Table& tableNKA, std::set
 			{
 				for (auto& vertex : cell)
 				{
-					if (namesOfChangedVertexes.find(vertex.name) != namesOfChangedVertexes.end()) vertex.isFinish = isFinish;
+					if (namesOfChangedVertexes.find(vertex.name) != namesOfChangedVertexes.end()) vertex.isFinish = true;
 				}
 			}
 		}
-
+		
 		transitions.push_back(std::make_pair(tableNKA[0][columnIndex][0], visitedVertexes));
 	}
 
@@ -162,7 +162,7 @@ void CNKAtoDKA::AddTransitionToDKATable(Table& tableDKA, const Table& tableNKA, 
 {
 	std::vector<Vertex> cell;
 
-	for (const auto& vertex : transitionsOutput)
+	for (auto vertex : transitionsOutput)
 	{
 		for (size_t row = 1; row < tableNKA.size(); row++)
 		{
@@ -172,8 +172,8 @@ void CNKAtoDKA::AddTransitionToDKATable(Table& tableDKA, const Table& tableNKA, 
 			std::vector<Vertex> tempCell;
 			tempCell.clear();
 			tempCell.push_back(vertex);
-			size_t column = FindColumnByInputCell(tableNKA, tempCell);
 
+			size_t column = FindColumnByInputCell(tableNKA, tempCell);
 			cell = tableNKA[row][column];
 
 			tempCell.clear();
@@ -226,7 +226,6 @@ void CNKAtoDKA::AddColumnToDKATable(
 		std::vector<Vertex> tempTransitions = FindTransitionsByVertex(transitions, vertex);
 
 		transitionsOuput.insert(transitionsOuput.end(), tempTransitions.begin(), tempTransitions.end());
-
 	}
 
 	transitionsOuput.erase(std::unique(transitionsOuput.begin(), transitionsOuput.end(),
@@ -329,28 +328,45 @@ bool CNKAtoDKA::WereSuchOutputCells(
 	return false;
 }
 
+std::string CNKAtoDKA::GetCellName(std::vector<Vertex> cell)
+{
+	std::string name = "";
+
+	for (const auto& vertex : cell)
+	{
+		name += vertex.name;
+	}
+
+	return name;
+}
+
 void CNKAtoDKA::AddOutputCellsToPair(
 	std::vector<std::pair<std::vector<Vertex>, std::vector<std::vector<Vertex>>>>& inputCellOutputCells,
 	const std::vector<std::vector<Vertex>>& outputCells,
-	std::vector<Vertex> inputCell
+	std::vector<Vertex> inputCell,
+	std::map<size_t, std::vector<std::string>>& namesOfMergedVertexes
 )
 {
-	for (auto& pairInputOutput : inputCellOutputCells)
+	for (size_t index = 0; index < inputCellOutputCells.size(); index++)
 	{
-		if (pairInputOutput.second.size() != outputCells.size()) continue;
+		if (inputCellOutputCells[index].second.size() != outputCells.size()) continue;
 
 		bool temp = true;
 
-		for (size_t cellIndex = 0; cellIndex < pairInputOutput.second.size(); cellIndex++)
+		for (size_t cellIndex = 0; cellIndex < inputCellOutputCells[index].second.size(); cellIndex++)
 		{
-			if (!AreEqualCells(pairInputOutput.second[cellIndex], outputCells[cellIndex])) temp = false;
+			if (!AreEqualCells(inputCellOutputCells[index].second[cellIndex], outputCells[cellIndex])) temp = false;
 		}
 
 		if (temp)
 		{
-			pairInputOutput.first.insert(pairInputOutput.first.end(), inputCell.begin(), inputCell.end());
-			pairInputOutput.first = RemoveDuplicates(pairInputOutput.first);
-			for (auto& cell : pairInputOutput.second)
+			inputCellOutputCells[index].first.insert(inputCellOutputCells[index].first.end(), inputCell.begin(), inputCell.end());
+			inputCellOutputCells[index].first = RemoveDuplicates(inputCellOutputCells[index].first);
+
+			std::string name = GetCellName(inputCell);
+			namesOfMergedVertexes[index].push_back(name);
+
+			for (auto& cell : inputCellOutputCells[index].second)
 			{
 				cell = RemoveDuplicates(cell);
 			}
@@ -378,10 +394,31 @@ size_t CNKAtoDKA::FindColumnWhichContainsCell(Table table, std::vector<Vertex> c
 	}
 }
 
+size_t CNKAtoDKA::FindColumnByMergedCellName(
+	const Table& tableDKA,
+	const std::map<size_t, std::vector<std::string>>& namesOfMergedVertexes, 
+	const std::vector<std::pair<std::vector<Vertex>, std::vector<std::vector<Vertex>>>>& inputCellOutputCells, 
+	const std::string& cellName
+)
+{
+	for (const auto& el : namesOfMergedVertexes)
+	{
+		if (std::find(el.second.begin(), el.second.end(), cellName) != el.second.end())
+		{
+			size_t index = el.first;
+
+			std::vector<Vertex> cell = inputCellOutputCells[index].first;
+
+			return FindColumnByInputCell(tableDKA, cell);
+		}
+	}
+}
+
 Table CNKAtoDKA::MinimizeDKATable(const Table& tableDKA)
 {
 	std::vector<std::pair<std::vector<Vertex>, std::vector<std::vector<Vertex>>>> inputCellOutputCells;
 	std::vector<std::vector<Vertex>> outputCells;
+	std::map<size_t, std::vector<std::string>> namesOfMergedVertexes;
 
 	for (size_t columnIndex = 1; columnIndex < tableDKA[0].size(); columnIndex++)
 	{
@@ -393,11 +430,19 @@ Table CNKAtoDKA::MinimizeDKATable(const Table& tableDKA)
 
 		if (WereSuchOutputCells(inputCellOutputCells, outputCells))
 		{
-			AddOutputCellsToPair(inputCellOutputCells, outputCells, tableDKA[0][columnIndex]);
+			AddOutputCellsToPair(inputCellOutputCells, outputCells, tableDKA[0][columnIndex], namesOfMergedVertexes);
 		}
 		else
 		{
 			inputCellOutputCells.push_back(std::make_pair(tableDKA[0][columnIndex], outputCells));
+			std::vector<std::string> vertexesNames;
+			std::string name;
+			for (auto vertex : tableDKA[0][columnIndex])
+			{
+				name += vertex.name;
+			}
+			vertexesNames.push_back(name);
+			namesOfMergedVertexes[inputCellOutputCells.size() - 1] = vertexesNames;
 		}
 	}
 
@@ -428,7 +473,11 @@ Table CNKAtoDKA::MinimizeDKATable(const Table& tableDKA)
 
 			if (column == minimezedTableDKA[0].size())
 			{				
-				column = FindColumnWhichContainsCell(minimezedTableDKA, minimezedTableDKA[rowIndex][columnIndex]);
+				column = FindColumnByMergedCellName(
+					minimezedTableDKA, 
+					namesOfMergedVertexes, 
+					inputCellOutputCells, 
+					GetCellName(minimezedTableDKA[rowIndex][columnIndex]));
 				
 				minimezedTableDKA[rowIndex][columnIndex] = minimezedTableDKA[0][column];
 			}
@@ -438,12 +487,23 @@ Table CNKAtoDKA::MinimizeDKATable(const Table& tableDKA)
 	return minimezedTableDKA;
 }
 
+void CNKAtoDKA::SortTableStates(Table& table)
+{
+	for (auto& row : table)
+	{
+		std::vector<std::vector<Vertex>> newRow;
+		for (auto& cell : row)
+		{
+			std::sort(cell.begin(), cell.end(), CNKAtoDKA::CompareByName);
+		}
+	}
+}
+
 Table CNKAtoDKA::ConvertNKAtoDKA(const Table& tableNKA)
 {
 	Table tableDKA;
 	Table tempTable = tableNKA;
 	std::set<std::string> namesOfChangedVertexes;
-
 
 	Transitions transitions = CreateTransitionsByEmptySymbols(tempTable, namesOfChangedVertexes);
 
@@ -463,16 +523,14 @@ Table CNKAtoDKA::ConvertNKAtoDKA(const Table& tableNKA)
 	ChangeFinishStates(tableDKA);
 
 	Table oldTableDKA;
-	int i = 1;
 	while (!AreEqualTables(tableDKA, oldTableDKA))
 	{
 		oldTableDKA = tableDKA;
-		if (i == 3) return tableDKA;
 		tableDKA = MinimizeDKATable(oldTableDKA);
-		/*if (i == 1) return tableDKA;*/
 		ChangeFinishStates(tableDKA);
-		i++;
 	}
+
+	SortTableStates(tableDKA);
 
 	return tableDKA;
 }
